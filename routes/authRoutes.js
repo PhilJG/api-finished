@@ -3,6 +3,7 @@ import db from '../db.js'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 const router = Router()
+
 const jwtSecret = process.env.JWTSECRET
 
 router.post('/signup', async (req, res) => {
