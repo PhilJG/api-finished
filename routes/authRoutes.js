@@ -14,8 +14,8 @@ router.post('/signup', async (req, res) => {
     if (!req.body.password) {
       throw new Error('password is required')
     }
-    if (!req.body.picture) {
-      throw new Error('picture is required')
+    if (!req.body.profile_pic) {
+      throw new Error('profile_pic is required')
     }
     if (!req.body.first_name) {
       throw new Error('first_name is required')
@@ -39,8 +39,8 @@ router.post('/signup', async (req, res) => {
     const hashedPassword = await bcrypt.hash(req.body.password, salt)
     // Save user
     const { rows } = await db.query(`
-      INSERT INTO users (first_name, last_name, email, password, picture)
-      VALUES ('${req.body.first_name}', '${req.body.last_name}', '${req.body.email}', '${hashedPassword}', '${req.body.picture}')
+      INSERT INTO users (first_name, last_name, email, password, profile_pic)
+      VALUES ('${req.body.first_name}', '${req.body.last_name}', '${req.body.email}', '${hashedPassword}', '${req.body.profile_pic}')
       RETURNING *
     `)
     let user = rows[0]
@@ -121,7 +121,7 @@ router.get('/profile', async (req, res) => {
       throw new Error('Invalid authentication token')
     }
     const { rows: userRows } = await db.query(`
-      SELECT user_id, first_name, last_name, picture, email
+      SELECT user_id, first_name, last_name, profile_pic, email
       FROM users WHERE user_id = ${decodedToken.user_id}
     `)
     res.json(userRows[0])
@@ -141,7 +141,7 @@ router.patch('/profile', async (req, res) => {
     if (
       !req.body.first_name &&
       !req.body.last_name &&
-      !req.body.picture &&
+      !req.body.profile_pic &&
       !req.body.email
     ) {
       throw new Error('at least 1 field must be modified')
@@ -157,11 +157,11 @@ router.patch('/profile', async (req, res) => {
     if (req.body.email) {
       query += `email = '${req.body.email}', `
     }
-    if (req.body.picture) {
-      query += `picture = '${req.body.picture}', `
+    if (req.body.profile_pic) {
+      query += `profile_pic = '${req.body.profile_pic}', `
     }
     query = query.slice(0, -2)
-    query += `WHERE user_id = ${decodedToken.user_id} RETURNING picture, first_name, last_name, email, user_id`
+    query += `WHERE user_id = ${decodedToken.user_id} RETURNING profile_pic, first_name, last_name, email, user_id`
     const { rows: userRows } = await db.query(query)
     // Respond
     res.json(userRows[0])
